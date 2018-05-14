@@ -1,0 +1,14 @@
+[geometry]
+
+# The base area of the cistern in m²
+base_area = 1.2
+
+[detection.range]
+
+# The range detected when the cistern is full. Shorter ranges will be reported
+# as this value.
+min = 0.5
+
+# The range detected when the cistern is empty. Longer ranges will be reported
+# as this value.
+max = 3.2

@@ -15,6 +15,8 @@ $ cargo build --release
 
 This will produce an executable in the `./target/release` subdirectory.
 
+In case you encounter errors please refer to the [Troubleshooting](https://github.com/slotbaer/open-cisterna/wiki/Troubleshooting) wiki page.
+
 ## Adjust Log Level
 
 Logging is controlled using environment variables (for details see the offical

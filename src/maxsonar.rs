@@ -29,10 +29,17 @@ pub fn read_distance(port_name: &str) -> Result<u16, String>  {
             let read = port.read(serial_buf.as_mut_slice()).map(|r| r as usize);
             match read {
                 Ok(t) => {
-                    debug!("Read {} bytes from serial port: {:?}", t, serial_buf);
+                    debug!("Read {} bytes from serial port '{}': {:?}", t, port_name, serial_buf);
                     match v.len() {
-                        0 => v.extend(serial_buf[..t].iter().skip_while(|b| **b != 82u8).take_while(|b| **b != 13u8)),
-                        _ => v.extend(serial_buf[..t].iter().take_while(|b| **b != 13u8))
+                        0 => v.extend(
+                                serial_buf[..t]
+                                    .iter()
+                                    .skip_while(|b| **b != 82u8)
+                                    .take_while(|b| **b != 13u8)),
+                        _ => v.extend(
+                                serial_buf[..t]
+                                    .iter()
+                                    .take_while(|b| **b != 13u8))
                     }
                     debug!("Read buffer contents: {:?}", v);
                     if v.len() == 5 {
@@ -47,11 +54,13 @@ pub fn read_distance(port_name: &str) -> Result<u16, String>  {
                         return r
                     }
                 },
-                Err(ref e) if e.kind() == io::ErrorKind::TimedOut => println!("time out"),
-                Err(e) => eprintln!("{:?}", e),
+                Err(ref e) if e.kind() == io::ErrorKind::TimedOut =>
+                    error!("Timed out while reading from serial port '{}'", port_name),
+                Err(e) =>
+                    error!("Unexpected error encountered while reading from serial port '{}': {:?}", port_name, e),
             }
         }
     } else {
-        Err(format!("Error: Port '{}' not available", &port_name))
+        Err(format!("Port '{}' not available", &port_name))
     }
 }

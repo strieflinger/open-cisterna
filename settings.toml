@@ -3,6 +3,14 @@
 # The base area of the cistern in m²
 base_area = 1.2
 
+[detection]
+
+# The serial port to which the sonar sensor is connected.
+port = "/dev/serial0"
+
+# The number of seconds between two successiv distance detections.
+interval = 10
+
 [detection.range]
 
 # The range detected when the cistern is full. Shorter ranges will be reported

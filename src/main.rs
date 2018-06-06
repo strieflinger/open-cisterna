@@ -88,14 +88,14 @@ struct CisternState {
 
 fn detect_distance(port_name: &str) -> Result<u16, String> {
     let distance = maxsonar::read_distance(port_name)?;
-    info!("Detected distance: {} cm", distance);
+    info!("Detected distance: {} mm", distance);
     Ok(distance)
 }
 
 fn normalize_distance(r: f64, cfg: &OpenCisternaConfig) -> f64 {
     let nr = r.max(cfg.range.min).min(cfg.range.max);
     if r < cfg.range.min || r > cfg.range.max {
-        warn!("Detected distance {} is out of bounds: {:?}. Normalized to {}", r, cfg.range, nr);
+        warn!("Detected distance {} m is out of bounds: {:?}. Normalized to {} m", r, cfg.range, nr);
     }
     nr
 }
@@ -110,7 +110,7 @@ fn compute_state(distance: f64, cfg: &OpenCisternaConfig) -> CisternState {
 
 #[get("/cistern/state", format = "application/json")]
 fn state(cfg: State<OpenCisternaConfig>, distance: State<Arc<AtomicUsize>>) -> Json<CisternState> {
-    Json(compute_state((distance.load(Ordering::Relaxed) as f64) / 100.0, &cfg))
+    Json(compute_state((distance.load(Ordering::Relaxed) as f64) / 1000.0, &cfg))
 }
 
 #[get("/cistern/geometry", format = "application/json")]
@@ -136,7 +136,7 @@ fn main() {
             match detect_distance(port.as_str()) {
                 Ok(distance) => {
                     distance_sink.store(distance as usize, Ordering::Relaxed);
-                    info!("Update current distance to {} cm", distance);
+                    info!("Update current distance to {} mm", distance);
                 },
                 Err(reason) => error!("Reading distance from sensor failed: {}", reason)
             }

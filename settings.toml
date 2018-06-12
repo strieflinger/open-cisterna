@@ -3,6 +3,11 @@
 # The base area of the cistern in m²
 base_area = 1.2
 
+[sensor]
+
+# The distance in m returned by the sensor in case no object has been detected
+no_detection_distance = 5.0
+
 [detection]
 
 # The serial port to which the sonar sensor is connected.

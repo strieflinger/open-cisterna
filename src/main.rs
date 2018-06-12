@@ -24,6 +24,8 @@ extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
 
 use rocket::State;
+use rocket::response::status::Custom;
+use rocket::http::Status;
 use rocket_contrib::Json;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -46,6 +48,7 @@ struct Range {
 #[derive(Debug)]
 struct OpenCisternaConfig {
     geometry: Geometry,
+    no_detection_distance: usize,
     port: String,
     interval: u64,
     range: Range
@@ -57,6 +60,10 @@ impl OpenCisternaConfig {
             geometry: Geometry {
                 base_area: cfg.get_float("geometry.base_area").unwrap()
             },
+            no_detection_distance: cfg
+                .get_float("sensor.no_detection_distance")
+                .map(|d| (d * 1000.0) as usize)
+                .unwrap(),
             port: cfg.get_str("detection.port").unwrap(),
             interval: match cfg.get_int("detection.interval").unwrap() {
                 i if i <= 0 => panic!("detection interval must be strictly positive"),
@@ -109,8 +116,16 @@ fn compute_state(distance: f64, cfg: &OpenCisternaConfig) -> CisternState {
 }
 
 #[get("/cistern/state", format = "application/json")]
-fn state(cfg: State<OpenCisternaConfig>, distance: State<Arc<AtomicUsize>>) -> Json<CisternState> {
-    Json(compute_state((distance.load(Ordering::Relaxed) as f64) / 1000.0, &cfg))
+fn state(cfg: State<OpenCisternaConfig>, distance: State<Arc<AtomicUsize>>) -> Result<Json<CisternState>, Custom<&'static str>> {
+    let d = distance.load(Ordering::Relaxed);
+    match d {
+        d if d == cfg.no_detection_distance =>
+                Err(Custom(
+                        Status::InternalServerError,
+                        "Fluid surface not detected or too far away")),
+        _ => Ok(Json(compute_state((d as f64) / 1000.0, &cfg)))
+    }
+
 }
 
 #[get("/cistern/geometry", format = "application/json")]

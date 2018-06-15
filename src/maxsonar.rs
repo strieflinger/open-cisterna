@@ -15,11 +15,35 @@
 extern crate serialport;
 
 use maxsonar::serialport::prelude::*;
+use rppal::gpio::{Gpio, Level, Mode, PullUpDown};
 use std::io;
 use std::str;
+use std::sync::Mutex;
+use std::thread;
 use std::time::Duration;
 
+// GPIO connected to port 4 of the MaxSonar sensor. BCM 22 is located on physical pin 15.
+const GPIO_TRIGGER: u8 = 22;
+
+lazy_static! {
+    static ref GPIO: Mutex<Gpio> = Mutex::new({
+        let mut gpio = Gpio::new().unwrap();
+        gpio.set_pullupdown(GPIO_TRIGGER, PullUpDown::PullDown);
+        gpio.set_mode(GPIO_TRIGGER, Mode::Output);
+        gpio
+    });
+}
+
 pub fn read_distance(port_name: &str) -> Result<u16, String>  {
+    let gpio = GPIO.lock().unwrap();
+    gpio.write(GPIO_TRIGGER, Level::High);
+    thread::sleep(Duration::from_millis(200)); // Wait to be sure to be in free run mode.
+    let distance = read_from_serial(port_name);
+    gpio.write(GPIO_TRIGGER, Level::Low);
+    distance
+}
+
+fn read_from_serial(port_name: &str) -> Result<u16, String> {
     let mut settings: SerialPortSettings = Default::default();
     settings.timeout = Duration::from_millis(100);
     if let Ok(mut port) = serialport::open_with_settings(&port_name, &settings) {

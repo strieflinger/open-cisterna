@@ -19,9 +19,11 @@ use std::io;
 use std::str;
 use std::time::Duration;
 
+const SERIAL_PORT_TIMEOUT_MILLIS: u64  = 500;
+
 pub fn read_distance(port_name: &str) -> Result<u16, String>  {
     let mut settings: SerialPortSettings = Default::default();
-    settings.timeout = Duration::from_millis(100);
+    settings.timeout = Duration::from_millis(SERIAL_PORT_TIMEOUT_MILLIS);
     if let Ok(mut port) = serialport::open_with_settings(&port_name, &settings) {
         let mut serial_buf: Vec<u8> = vec![0; 6];
         let mut v: Vec<u8> = Vec::with_capacity(5);

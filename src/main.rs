@@ -84,7 +84,7 @@ fn read_config() -> OpenCisternaConfig {
     let mut cfg = config::Config::default();
     cfg
         .merge(config::File::with_name("settings")).unwrap()
-        .merge(config::Environment::with_prefix("OPEN_CISTERNA")).unwrap();
+        .merge(config::Environment::with_prefix("opencisterna")).unwrap();
     OpenCisternaConfig::new(cfg)
 }
 

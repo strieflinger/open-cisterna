@@ -16,12 +16,13 @@
 #![plugin(rocket_codegen)]
 
 extern crate config;
+extern crate env_logger;
+#[macro_use] extern crate log;
 extern crate rand;
 extern crate rocket;
-#[macro_use] extern crate log;
-extern crate env_logger;
 extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
+extern crate sysfs_gpio;
 
 use rocket::State;
 use rocket::response::status::Custom;

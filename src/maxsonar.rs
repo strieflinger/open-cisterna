@@ -17,9 +17,34 @@ extern crate serialport;
 use maxsonar::serialport::prelude::*;
 use std::io;
 use std::str;
+use std::thread;
 use std::time::Duration;
+use sysfs_gpio::{Direction, Error, Pin};
+
+// GPIO connected to port 4 of the MaxSonar sensor. BCM 22 is located on physical pin 15.
+const GPIO_TRIGGER: u64 = 22;
+const FREE_RUN_MODE_DELAY_MILLIS: u64 = 132; // MB7380 datasheet page 9
 
 pub fn read_distance(port_name: &str) -> Result<u16, String>  {
+    let trigger = Pin::new(GPIO_TRIGGER);
+    let init = || -> Result<(), Error> {
+        trigger.export()?;
+        trigger.set_direction(Direction::Out)?;
+        trigger.set_value(1)?;
+        thread::sleep(Duration::from_millis((FREE_RUN_MODE_DELAY_MILLIS as f64 * 1.1) as u64));
+        Ok(())
+    };
+    try!(init().map_err(|e| e.to_string()));
+    let result = read_from_serial(port_name)?;
+    let deinit = || -> Result<(), Error> {
+        trigger.set_value(0)?;
+        Ok(())
+    };
+    try!(deinit().map_err(|e| e.to_string()));
+    Ok(result)
+}
+
+fn read_from_serial(port_name: &str) -> Result<u16, String> {
     let mut settings: SerialPortSettings = Default::default();
     settings.timeout = Duration::from_millis(100);
     if let Ok(mut port) = serialport::open_with_settings(&port_name, &settings) {

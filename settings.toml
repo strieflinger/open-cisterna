@@ -13,8 +13,8 @@ no_detection_distance = 5.0
 # The serial port to which the sonar sensor is connected.
 port = "/dev/serial0"
 
-# The number of seconds between two successiv distance detections.
-interval = 10
+# The number of seconds between two successive distance detections.
+interval = 900
 
 [detection.range]
 

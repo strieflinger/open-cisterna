@@ -17,14 +17,12 @@
 
 extern crate config;
 extern crate env_logger;
-#[macro_use] extern crate lazy_static;
 #[macro_use] extern crate log;
 extern crate rand;
 extern crate rocket;
 extern crate rocket_contrib;
-extern crate rppal;
 #[macro_use] extern crate serde_derive;
-extern crate serialport;
+extern crate sysfs_gpio;
 
 use rocket::State;
 use rocket::response::status::Custom;

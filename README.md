@@ -64,6 +64,15 @@ $ sudo dpkg -r opencisterna
 
 ### Configuration
 
+All parameters defined in `settings.toml` can be adjusted. You can either
+edit the file directly (`/etc/opencisterna/settings.toml` in case you have
+deployed the service) or using environment variables as described below for
+the example of the logging level. The environment variable names are derived
+from the configuration file property names by prepending the prefix
+`OPENCISTERNA_` and concatenating the capitalized section name and property
+name, e.g. `[detection] interval = 400` becomes
+`OPENCISTERNA_DETECTION_INTERVAL=400`.
+
 #### Adjust Log Level
 
 Logging is controlled using environment variables (for details see the offical

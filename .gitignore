@@ -1,3 +1,11 @@
 
 /target
 **/*.rs.bk
+
+# Debian
+debian/**/*
+!changelog
+!compat
+!control
+!rules
+!opencisterna.service

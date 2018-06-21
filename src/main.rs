@@ -28,6 +28,7 @@ use rocket::State;
 use rocket::response::status::Custom;
 use rocket::http::Status;
 use rocket_contrib::Json;
+use std::env;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
@@ -82,8 +83,10 @@ impl OpenCisternaConfig {
 
 fn read_config() -> OpenCisternaConfig {
     let mut cfg = config::Config::default();
+    let cfg_path = env::var("OPENCISTERNA_CONFIG_FILE").unwrap_or("./settings.toml".into());
+    info!("Reading configuration from: {}", cfg_path);
     cfg
-        .merge(config::File::with_name("settings")).unwrap()
+        .merge(config::File::new(cfg_path.as_str(), config::FileFormat::Toml)).unwrap()
         .merge(config::Environment::with_prefix("opencisterna")).unwrap();
     OpenCisternaConfig::new(cfg)
 }

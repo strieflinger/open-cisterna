@@ -1,0 +1,6 @@
+Source: opencisterna
+Maintainer: Slotbaer
+
+Package: opencisterna
+Architecture: any
+Description: Open Source Fluid-level sensor

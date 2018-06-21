@@ -2,7 +2,9 @@
 
 [![ASLv2](https://img.shields.io/badge/license-Apache%20License%20v2.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-## Building from source
+## Building
+
+### From Source
 
 ```bash
 # download Open Cistena code
@@ -15,14 +17,83 @@ $ cargo build --release
 
 This will produce an executable in the `./target/release` subdirectory.
 
+#### Troubleshooting
+
 In case you encounter errors please refer to the [Troubleshooting](https://github.com/slotbaer/open-cisterna/wiki/Troubleshooting) wiki page.
 
-## Adjust Log Level
+### Debian Package
+
+Sources for building a very basic Debian package are located in the `debian`
+folder. To build the package invoke the following commands from the root of
+the source tree
+
+```bash
+$ cargo build --release
+$ sudo apt-get install debhelper
+$ dpkg-buildpackage -us -uc -b
+```
+
+The package will have been built one level below the root of the source tree.
+
+## Usage
+
+We recommend using the Debian package as it will setup a systemd service automatically.
+
+### Installation
+
+You can install the package by invoking
+
+```bash
+$ sudo dpkg -i *.deb
+```
+### Checking the Service Status
+
+The status of the service can be checked using
+
+```bash
+$ sudo systemctl status opencisterna.service
+```
+
+### Uninstallation
+
+Uninstallation is accomplished by invoking
+
+```bash
+$ sudo dpkg -r opencisterna
+```
+
+### Configuration
+
+All parameters defined in `settings.toml` can be adjusted. You can either
+edit the file directly (`/etc/opencisterna/settings.toml` in case you have
+deployed the service) or using environment variables as described below for
+the example of the logging level. The environment variable names are derived
+from the configuration file property names by prepending the prefix
+`OPENCISTERNA_` and concatenating the capitalized section name and property
+name, e.g. `[detection] interval = 400` becomes
+`OPENCISTERNA_DETECTION_INTERVAL=400`.
+
+#### Adjust Log Level
 
 Logging is controlled using environment variables (for details see the offical
 doc.rs [documentation](https://docs.rs/env_logger/0.5.10/env_logger/)). The
-default log level is `error`. To set the log level to `info` for example use
+default log level is `error`. To set the log level to `debug` for example use
 
 ```bash
-$ RUST_LOG=info ./target/release/open-cisterna
+$ RUST_LOG=debug ./target/release/open-cisterna
+```
+
+For the systemd service you have to modify the service configuration. This can
+be accomplished using
+
+```bash
+$ sudo systemctl edit opencisterna.service
+```
+
+This will create an overlay file in which you can define new values for the
+environment variables for the `open-cisterna` process. To adjust the logging
+level to `debug` you should add the following line to the file
+
+```bash
+Environment="RUST_LOG=debug"
 ```

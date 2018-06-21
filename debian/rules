@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+DISTRIBUTION = $(shell lsb_release -sr)
+VERSION = 0.1-alpha.1
+PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+override_dh_auto_test:
+override_dh_auto_build:
+override_dh_auto_install:
+	cargo build
+	mkdir -p debian/opencisterna/etc/opencisterna
+	install -cm 644 settings.toml debian/opencisterna/etc/opencisterna/settings.toml
+	mkdir -p debian/opencisterna/usr/bin
+	cp target/debug/open-cisterna debian/opencisterna/usr/bin
+
+override_dh_gencontrol:
+	dh_gencontrol -- -v$(PACKAGEVERSION)

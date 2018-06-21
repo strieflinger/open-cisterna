@@ -1,0 +1,13 @@
+[Unit]
+Description=opencisterna daemon
+After=network.target
+
+[Service]
+Environment="ROCKET_ENV=prod"
+Environment="RUST_LOG=info"
+Environment="OPENCISTERNA_CONFIG_FILE=/etc/opencisterna/settings.toml"
+ExecStart=/usr/bin/open-cisterna
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

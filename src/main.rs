@@ -114,8 +114,8 @@ fn normalize_distance(r: f64, cfg: &OpenCisternaConfig) -> f64 {
 fn compute_state(distance: f64, cfg: &OpenCisternaConfig) -> CisternState {
     let l = normalize_distance(distance, cfg) - cfg.range.min;
     CisternState {
-        level: l / (cfg.range.max - cfg.range.min),
-        quantity: l * cfg.geometry.base_area
+        level: 1 - (l / (cfg.range.max - cfg.range.min)),
+        quantity: ((cfg.range.max - cfg.range.min) - l)* cfg.geometry.base_area
     }
 }
 
